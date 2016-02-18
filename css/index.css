@@ -1,5 +1,6 @@
 #canvas{
 	box-shadow: 0 0 3px black;
+	background: rgb(222,183,20);
 	display: block;
 	margin: 0 auto;
 	position: absolute;
