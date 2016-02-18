@@ -1,0 +1,10 @@
+#canvas{
+	box-shadow: 0 0 3px black;
+	display: block;
+	margin: 0 auto;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -300px;
+	margin-top: -300px;
+}
