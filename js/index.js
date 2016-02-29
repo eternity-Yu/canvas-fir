@@ -94,10 +94,15 @@ window.onload=function(){
 		return r;
 	}
 
-	//var flag=localStorage.x?false:true;//该谁落子
-	var flag=true;
+	var flag=localStorage.x?false:true;//该谁落子
+	//var flag=true;
 	var qizi={};
+	var t1;
+	var p;
 	canvas.onclick=function(e){
+		p=0;
+		clearInterval(t1);
+		//console.log(p)
 		var x=Math.round((e.offsetX-20.5)/40);
 		var y=Math.round((e.offsetY-20.5)/40);
 		if(qizi[x+'_'+y]){return;}
@@ -136,40 +141,172 @@ window.onload=function(){
 			}
 		}
 		flag=!flag;
-
-		/*localStorage.data=JSON.stringify(qizi);
+		
+		drawClock();
+		t1=setInterval(drawClock,1000);
+		localStorage.data=JSON.stringify(qizi);
+		//落黑子时本地存储数据x=1,落白子时清除本地数据x=1
 		if(!flag){
 			localStorage.x=1;
 		}
 		else{
 			localStorage.removeItem('x');
-		}*/
-		/*huiqi.onclick=function(){
-			var newqizi={};
-			for(var i in qizi){
-				if(i != (x+'_'+y)){
-					newqizi[i]=qizi[i];
-				}
-				qizi = newqizi;
-				console.log(newqizi)
-				flag=!flag;
-				ctx.clearRect(x*40,y*40,40,40);
-			// }
-		}*/
+		}
 	}
-	/*如果本地存储过程中有棋盘数据 读取这些数据并绘制到棋盘中*/
-		/*if(localStorage.data){
-			qizi=JSON.parse(localStorage.data);
-			for(var i in qizi){
-				var x=i.split('_')[0];
-				var y=i.split('_')[1];
-				luozi(x,y,qizi[i]=='black');
+		//localStorage  本地保存数据
+    	//JSON.stringify(obj)对象转字符串
+   		//JSON.parse(str)字符串转对象
+/*	*/	huiqi.onclick=function(){
+			data=JSON.parse(localStorage.data);
+			if(JSON.stringify(data)==0){
+				huiqi.onclick=null;
+				return;
 			}
-		}*/
+			var xyqizi=[];
+			var colorqizi=[];
+			for(var i in data){
+				xyqizi.push(i);
+				colorqizi.push(data[i]);
+			}
+			xyqizi.pop();
+			colorqizi.pop();
+			for(var i=0;i<colorqizi.length;i++){
+				var x=xyqizi[i].split('_')[0];
+				var y=xyqizi[i].split('_')[1];
+				luozi(x,y,(colorqizi[i]=='black')?true:false);
+				if((colorqizi[i]=='black')?true:false){
+					localStorage.x=1;
+				}
+				else{
+					localStorage.removeItem('x');
+				}
+			}
+			data={};
+			for(var i=0;i<xyqizi.length;i++){
+				var x=xyqizi[i].split('_')[0];
+				var y=xyqizi[i].split('_')[1];
+				data[x+'_'+y]=colorqizi[i];
+				if((colorqizi[i]=='black')?true:false){
+					localStorage.x=1;
+				}
+				else{
+					localStorage.removeItem('x');
+				
+				}
+			}
+			localStorage.data=JSON.stringify(data);
+			location.reload();
+
+		}
+	
+
+	/*如果本地存储过程中有棋盘数据 读取这些数据并绘制到棋盘中 页面刷新时不会更新 可以保留上次的棋盘*/
+	if(localStorage.data){
+		qizi=JSON.parse(localStorage.data);
+		for(var i in qizi){
+			var x=i.split('_')[0];
+			var y=i.split('_')[1];
+			luozi(x,y,(qizi[i]=='black')?true:false);
+		}
+	}
+	
 
 	chongzhi.onclick=function(){
 		localStorage.clear();
 		location.reload();
-	}
+	 }
+	
 
+
+//钟表
+//创建表盘
+	var canvas2=document.querySelector("#canvas2");
+	var ctx2=canvas2.getContext('2d');
+	p=0;
+	var drawClock=function(){
+		ctx2.clearRect(0,0,200,200);
+		ctx2.save();
+		ctx2.translate(100,100);
+
+			//画表盘
+			ctx2.save();
+			ctx2.strokeStyle="#2af";
+			ctx2.lineWidth=8;
+			ctx2.beginPath();
+			ctx2.arc(0,0,80,0,Math.PI*2);
+			ctx2.stroke();
+			ctx2.restore();
+
+			//画刻度
+			ctx2.save();
+			ctx2.strokeStyle="black";
+			ctx2.lineWidth=4;
+			ctx2.lineCap='round';
+			for(var i=1;i<61;i++){
+				ctx2.rotate(Math.PI/30);
+				ctx2.beginPath();
+				if(i%5==0){
+					ctx2.lineWidth=3;
+					ctx2.moveTo(64,0);
+				}
+				else{
+					ctx2.lineWidth=2;
+					ctx2.moveTo(68,0);
+				}
+				ctx2.lineTo(72,0);
+				ctx2.stroke();
+			}
+			ctx2.restore();
+
+			//画秒针
+			ctx2.save();
+			//console.log(p);
+			ctx2.rotate(Math.PI/30*p);
+			p++;
+			//console.log(x)
+			ctx2.lineWidth=2;
+			ctx2.strokeStyle="red";
+			ctx2.lineCap='round';
+			ctx2.beginPath();
+			ctx2.moveTo(0,10);
+			ctx2.lineTo(0,-60);
+			ctx2.stroke();
+			ctx2.restore();
+
+			//画圆圈
+			ctx2.save();
+			ctx2.lineWidth=2;
+			ctx2.strokeStyle='black';
+			ctx2.beginPath();
+			ctx2.moveTo(2,0);
+			ctx2.arc(0,0,2,0,Math.PI*2);
+			ctx2.stroke();
+			ctx2.restore();
+
+			// //画分针
+			// ctx2.save();
+			// ctx2.lineCap='round';
+			// ctx2.strokeStyle='blue';
+			// ctx2.lineWidth=3;
+			// ctx2.beginPath();
+			// ctx2.moveTo(0,10);
+			// ctx2.lineTo(0,-52);
+			// ctx2.stroke();
+			// ctx2.restore();
+
+			// //画时针
+			// ctx2.save();
+			// ctx2.lineWidth=4;
+			// ctx2.lineCap='round';
+			// ctx2.beginPath();
+			// ctx2.moveTo(0,10);
+			// ctx2.lineTo(0,-42);
+			// ctx2.stroke();
+			// ctx2.restore();
+
+		ctx2.restore();
+	}
+	drawClock();
+	
+	
 }
